@@ -21,10 +21,10 @@ const avenir = localFont({
 const cachedFetches: any = {}
 const cachedFetch = (name: string) => {
   if(!cachedFetches[name]){
-    cachedFetches[name] = axios.post(`http://localhost:3000/check-username`, {username: name})
-    .then( (res) => ({
-      status: res.status,
-      data: res.status === 200 ? res.data : null
+    cachedFetches[name] = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
+    .then( async (res: any) => ({
+      error: await res.data.error,
+      data: await res.data.data 
     }));
   }
   return cachedFetches[name];
@@ -37,7 +37,8 @@ export default function Home() {
   const [ search, setSearched ] = useState<boolean>()
   const [ loading, setLoading ] = useState<boolean>(false)
 
-  const data: { data: { valid: string | boolean}, status: number, src?: string} = search ? use(cachedFetch(name)) : {status: 200, src: 'internal', data: {  valid: "Enter username for status..."}};
+  // const data: { data: { valid: string | boolean}, status: number, src?: string} = search ? use(cachedFetch(name)) : {status: 200, src: 'internal', data: {  valid: "Enter username for status..."}};
+  const data: any = search ? use(cachedFetch(name)) : {status: 200, src: 'internal', data: {  valid: "Enter username for status..."}};
 
   const handleClick = () => {
     setSearched(false)
@@ -48,15 +49,10 @@ export default function Home() {
       return
     }
     setUsername(inputValue);
-    setLoading(true)
     setSearched(true);
+    setLoading(true)
   }
 
-  useEffect(() => {
-    if(data.src === null || data.src === undefined){
-      setLoading(false)
-    }
-  },[loading, data.src])
 
 
 
@@ -70,17 +66,17 @@ export default function Home() {
           </svg>
           </label>
           <input className={avenir.variable} name="username" type="text" ref={inputRef} placeholder="Enter username" />
-          <button className={styles.button} onClick={() => handleClick()}>{ !loading ? "Check now >" : "searching..."} </button>
+          <button className={styles.button} onClick={() => handleClick()}>{ loading === false ? "Check now >" : "searching..."} </button>
         </div>
       </section>
       <section className={styles.responseSection}>
         {
-          data?.data.valid === true && search ? (
+          data?.data.result === true && search ? (
           <div className={styles.reponseWrapper_success}>
           Username is available
           </div> ) : " " }
           
-          { data?.data.valid === false && search ? (
+          { data?.data.result === false && search ? (
           <div className={styles.reponseWrapper_error}>
           Username is unavailable
           </div> 
@@ -91,6 +87,12 @@ export default function Home() {
           <div className={styles.reponseWrapper}>
             Enter username for status...
           </div>
+        }
+        {  data?.error !== null && search ? (
+            <div className={styles.reponseWrapper_error}>
+            An Error occured. Please retry
+            </div> 
+            ): ''
         }
     
       </section>
