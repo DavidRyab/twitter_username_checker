@@ -22,10 +22,11 @@ const cachedFetches: any = {}
 const cachedFetch = (name: string) => {
   if(!cachedFetches[name]){
     cachedFetches[name] = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
-    .then( async (res: any) => ({
+    .then( async (res: any) => {
+      return {
       error: await res.data.error,
       data: await res.data.data 
-    }));
+    }});
   }
   return cachedFetches[name];
 }
@@ -38,7 +39,7 @@ export default function Home() {
   const [ loading, setLoading ] = useState<boolean>(false)
 
   // const data: { data: { valid: string | boolean}, status: number, src?: string} = search ? use(cachedFetch(name)) : {status: 200, src: 'internal', data: {  valid: "Enter username for status..."}};
-  const data: any = search ? use(cachedFetch(name)) : {status: 200, src: 'internal', data: {  valid: "Enter username for status..."}};
+  const data: any = search ? use(cachedFetch(name)) : { data: "Enter username for status..."};
 
   const handleClick = () => {
     setSearched(false)
@@ -53,7 +54,11 @@ export default function Home() {
     setLoading(true)
   }
 
-
+  useEffect(() => {
+    if(data.data !== "Enter username for status..." && loading === true){
+      setLoading(false);
+    }
+  },[data.data, loading])
 
 
   return (
@@ -71,12 +76,12 @@ export default function Home() {
       </section>
       <section className={styles.responseSection}>
         {
-          data?.data.result === true && search ? (
+          data?.data?.result === true && search ? (
           <div className={styles.reponseWrapper_success}>
           Username is available
           </div> ) : " " }
           
-          { data?.data.result === false && search ? (
+          { data?.data?.result === false && search ? (
           <div className={styles.reponseWrapper_error}>
           Username is unavailable
           </div> 
