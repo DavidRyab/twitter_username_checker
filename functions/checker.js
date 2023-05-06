@@ -1,7 +1,8 @@
 const chromium = require('chrome-aws-lambda');
 const puppeteer = require('puppeteer-extra')
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
+// chromium.puppeteer.use(StealthPlugin())
+// puppeteer.use(StealthPlugin());
 
 exports.handler = async function(event, context) {
   const data   = JSON.parse(event.body);
@@ -19,7 +20,7 @@ exports.handler = async function(event, context) {
       })
     }
   }
-  const browser = await puppeteer.launch({
+  const browser = await chromium.puppeteer.launch({
     args: chromium.args,
     executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath,
     headless: true,
