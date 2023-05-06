@@ -20,6 +20,8 @@
     "puppeteer": "^19.11.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "chrome-aws-lambda": "^10.1.0",
+    "fs": "^0.0.1-security",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"
