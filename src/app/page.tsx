@@ -75,6 +75,7 @@ export default function Home() {
         </div>
       </section>
       <section className={styles.responseSection}>
+        {JSON.stringify(data)}
         {
           data?.data?.result === true && search ? (
           <div className={styles.reponseWrapper_success}>
