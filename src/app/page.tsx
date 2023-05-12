@@ -69,8 +69,12 @@ export default function Home() {
           error: await res.data.error,
           data: await res.data.data 
         })
+        console.log({
+          error: await res.data.error,
+          data: await res.data.data 
+        })
     });
-    setrespData(d)
+    
     }
   },[loading, name])
 
