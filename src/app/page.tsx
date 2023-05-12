@@ -1,6 +1,6 @@
 "use client"
 import styles from './page.module.css'
-import { use, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import localFont from '@next/font/local'
 
@@ -18,18 +18,18 @@ const avenir = localFont({
   variable: '--font-avenir'
 })
 
-const cachedFetches: any = {}
-const cachedFetch = (name: string) => {
-  if(!cachedFetches[name]){
-    cachedFetches[name] = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
-    .then( async (res: any) => {
-      return {
-      error: await res.data.error,
-      data: await res.data.data 
-    }});
-  }
-  return cachedFetches[name];
-}
+// const cachedFetches: any = {}
+// const cachedFetch = (name: string) => {
+//   if(!cachedFetches[name]){
+//     cachedFetches[name] = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
+//     .then( async (res: any) => {
+//       return {
+//       error: await res.data.error,
+//       data: await res.data.data 
+//     }});
+//   }
+//   return cachedFetches[name];
+// }
 
 export default function Home() {
 
@@ -37,11 +37,11 @@ export default function Home() {
   const [ name, setUsername ] = useState('')
   const [ search, setSearched ] = useState<boolean>()
   const [ loading, setLoading ] = useState<boolean>(false)
-
-  // const data: { data: { valid: string | boolean}, status: number, src?: string} = search ? use(cachedFetch(name)) : {status: 200, src: 'internal', data: {  valid: "Enter username for status..."}};
-  const data: any = search ? use(cachedFetch(name)) : { data: "Enter username for status..."};
+  const [ respData, setrespData ] = useState<any>({ data: "Enter username for status...", error: null})
 
   const handleClick = () => {
+    console.log('Button clicked');
+    
     setSearched(false)
     const inputValue = inputRef.current?.value ?? '';
     console.log(inputValue);
@@ -51,15 +51,28 @@ export default function Home() {
     }
     setUsername(inputValue);
     setSearched(true);
-    setLoading(true)
+    console.log('loading set true');
+    
   }
 
-  useEffect(() => {
-    if(data.data !== "Enter username for status..." && loading === true){
-      setLoading(false);
-    }
-  },[data.data, loading])
 
+
+  useEffect(()=> {
+    if(name && loading === false){
+      setLoading(true)
+      const d = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
+      .then( async (res: any) => {
+        setLoading(false);
+        setUsername('')
+        setSearched(false)
+        setrespData({
+          error: await res.data.error,
+          data: await res.data.data 
+        })
+    });
+    setrespData(d)
+    }
+  },[loading, name])
 
   return (
     <main className={styles.main}>
@@ -71,30 +84,39 @@ export default function Home() {
           </svg>
           </label>
           <input className={avenir.variable} name="username" type="text" ref={inputRef} placeholder="Enter username" />
-          <button className={styles.button} onClick={() => handleClick()}>{ loading === false ? "Check now >" : "searching..."} </button>
+          <button 
+            className={styles.button} 
+            onClick={() => handleClick()}
+            disabled={loading}
+          >
+            {loading === true ? (
+              <div className={styles.spinner}></div>
+            ) : (
+              'Check now >'
+            )}
+          </button>
         </div>
       </section>
       <section className={styles.responseSection}>
-        {JSON.stringify(data)}
         {
-          data?.data?.result === true && search ? (
+          respData?.data?.result === true && !loading ? (
           <div className={styles.reponseWrapper_success}>
           Username is available
           </div> ) : " " }
           
-          { data?.data?.result === false && search ? (
+          { respData?.data?.result === false && !loading ? (
           <div className={styles.reponseWrapper_error}>
           Username is unavailable
           </div> 
           ): ""
         }
         {
-          !search &&
+          respData?.data === "Enter username for status..." || loading ? (
           <div className={styles.reponseWrapper}>
             Enter username for status...
-          </div>
+          </div>): ''
         }
-        {  data?.error !== null && search ? (
+        {  respData?.error !== null && !loading ? (
             <div className={styles.reponseWrapper_error}>
             An Error occured. Please retry
             </div> 

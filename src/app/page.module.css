@@ -107,6 +107,22 @@
   font-family: 'Satoshi', sans-serif;
 }
 
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #ccc;
+  border-top-color: #0b4f00;
+  animation: spin 0.8s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 768px) {
   .button{
     padding: 10px 15px;
