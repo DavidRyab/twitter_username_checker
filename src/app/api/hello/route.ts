@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
 
 async function checkName(username: string){
     try {
+    console.log(`${process.env.BACKEND_BASE_URL}/check-username`)
     const response = await axios.post(`${process.env.BACKEND_BASE_URL}/check-username`,{username});
     const body = response.data;
     console.log({body})
