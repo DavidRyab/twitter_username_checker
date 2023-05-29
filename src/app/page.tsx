@@ -60,7 +60,14 @@ export default function Home() {
   useEffect(()=> {
     if(name && loading === false){
       setLoading(true)
-      const d = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
+      // const d = axios.get(`${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/api/hello?username=${name}`)
+      const d = axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/check-username`,{username: name},{
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
+      })
       .then( async (res: any) => {
         setLoading(false);
         setUsername('')
